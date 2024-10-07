@@ -41,7 +41,7 @@ class _LandingPageState extends State<LandingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.network(
-              'https://upload.wikimedia.org/wikipedia/commons/e/e5/GHS_Imphal_001.jpg', 
+              'https://png.pngtree.com/background/20221028/original/pngtree-free-back-to-school-background-stationery-elements-picture-image_1931565.jpg',
               height: 200,
               width: 300,
               fit: BoxFit.cover,

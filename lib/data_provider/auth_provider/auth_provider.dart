@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../models/auth_response.dart';
 
 class AuthProvider {
-  final String baseUrl = "http://192.168.1.3:8000/api";
+  final String baseUrl = "http://192.168.8.6:8000/api";
 
   Future<AuthResponse> login(String email, String password) async {
     
