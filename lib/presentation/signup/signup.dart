@@ -2,27 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schoolui/bloc/signin/auth_event.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
-import 'package:schoolui/presentation/signup/signup.dart';
 import '../../bloc/signin/auth_bloc.dart';
 import '../../bloc/signin/auth_state.dart';
-import 'widgets/bazier_container.dart';
+import '../signin/widgets/bazier_container.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
+final nameController = TextEditingController();
 final emailController = TextEditingController();
-final passwordController = TextEditingController();
+final addressController = TextEditingController();
+final phoneController = TextEditingController();
 
-class _SignInPageState extends State<SignInPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  String? errorMessage; // To store the error message
+  String? errorMessage;
+  String? successMessage; // To store the success message
 
   Widget _entryField(TextEditingController controller, String title,
-      {bool isPassword = false}) {
+      {bool isPassword = false,
+      TextInputType keyboardType = TextInputType.text}) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -36,6 +39,7 @@ class _SignInPageState extends State<SignInPage> {
           TextFormField(
             controller: controller,
             obscureText: isPassword,
+            keyboardType: keyboardType,
             decoration: const InputDecoration(
               border: InputBorder.none,
               fillColor: Color(0xfff3f3f4),
@@ -43,7 +47,7 @@ class _SignInPageState extends State<SignInPage> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter some text';
+                return 'Please enter $title';
               }
               return null;
             },
@@ -51,36 +55,6 @@ class _SignInPageState extends State<SignInPage> {
         ],
       ),
     );
-  }
-
-  Widget _loginAccountLabel() {
-    return Container(
-        margin: const EdgeInsets.symmetric(vertical: 20),
-        padding: const EdgeInsets.all(15),
-        alignment: Alignment.bottomCenter,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Are you a school?',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(width: 10),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => SignUpPage()));
-              },
-              child: const Text(
-                'Sign up',
-                style: TextStyle(
-                    color: Color(0xfff79c4f),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ));
   }
 
   Widget _title() {
@@ -94,7 +68,7 @@ class _SignInPageState extends State<SignInPage> {
           Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
-              "School App",
+              "School App - Sign Up",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -111,9 +85,11 @@ class _SignInPageState extends State<SignInPage> {
       onTap: () {
         if (_formKey.currentState!.validate()) {
           BlocProvider.of<AuthBloc>(context).add(
-            LoginRequested(
+            SignUpRequested(
+              name: nameController.text,
               email: emailController.text,
-              password: passwordController.text,
+              address: addressController.text,
+              phone: phoneController.text,
             ),
           );
         }
@@ -139,7 +115,7 @@ class _SignInPageState extends State<SignInPage> {
           ),
         ),
         child: const Text(
-          'Sign In',
+          'Sign Up',
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       ),
@@ -151,8 +127,12 @@ class _SignInPageState extends State<SignInPage> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          _entryField(emailController, "Email"),
-          _entryField(passwordController, "Password", isPassword: true),
+          _entryField(nameController, "Name"),
+          _entryField(emailController, "Email",
+              keyboardType: TextInputType.emailAddress),
+          _entryField(addressController, "Address"),
+          _entryField(phoneController, "Phone Number",
+              keyboardType: TextInputType.phone),
         ],
       ),
     );
@@ -164,18 +144,16 @@ class _SignInPageState extends State<SignInPage> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          // Clear the text fields after successful sign-in
-          emailController.clear();
-          passwordController.clear();
-
-          // Navigate to the home page
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else if (state is AuthError) {
+        if (state is Authenticated) {
+          setState(() {
+            successMessage =
+                "Your request to register as a school is sent successfully and is under review. Check your email for the status.";
+            errorMessage = null; // Clear error message on success
+          });
+        } else if (state is SignupError) {
           setState(() {
             errorMessage = state.error;
+            successMessage = null; // Clear success message on error
           });
         }
       },
@@ -193,10 +171,17 @@ class _SignInPageState extends State<SignInPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children: [
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
                       SizedBox(height: height * .2),
                       _title(),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
+                      if (successMessage != null)
+                        Text(
+                          successMessage!,
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                      const SizedBox(height: 20),
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
@@ -211,18 +196,18 @@ class _SignInPageState extends State<SignInPage> {
                                 ),
                               const SizedBox(height: 10),
                               _submitButton(),
-                              _loginAccountLabel(),
+                              SizedBox(height: height * .1),
                             ],
                           ),
                         ),
                       ),
-                      if (state is AuthLoading)
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        ),
                     ],
                   ),
                 ),
+                if (state is AuthLoading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
               ],
             ),
           ),

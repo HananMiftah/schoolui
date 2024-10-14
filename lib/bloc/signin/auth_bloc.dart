@@ -12,16 +12,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginRequested>((event, emit) async {
       emit(AuthLoading());
       try {
-        final authResponse = await authRepository.login(event.email, event.password);
+        final authResponse =
+            await authRepository.login(event.email, event.password);
         emit(AuthAuthenticated(authResponse: authResponse));
       } catch (e) {
         emit(AuthError(error: e.toString()));
       }
     });
 
+    on<SignUpRequested>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final authResponse = await authRepository.signup(
+            event.email, event.name, event.address, event.phone);
+        emit(Authenticated(signupResponse: authResponse));
+      } catch (e) {
+        emit(SignupError(error: e.toString()));
+      }
+    });
+
     on<TokenRefreshed>((event, emit) async {
       try {
-        final newAccessToken = await authRepository.refreshToken(event.refreshToken);
+        final newAccessToken =
+            await authRepository.refreshToken(event.refreshToken);
         // Handle new access token here
       } catch (e) {
         emit(AuthError(error: e.toString()));

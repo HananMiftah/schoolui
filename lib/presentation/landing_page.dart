@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:schoolui/presentation/home/homepage.dart';
+import 'package:schoolui/presentation/school/school_homepage.dart';
 
 import 'signin/signin.dart';
 

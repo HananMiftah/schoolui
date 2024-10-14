@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:schoolui/presentation/Teacher/addTeacherPage.dart';
+import 'package:schoolui/presentation/core/appdrawer.dart';
+import 'package:schoolui/presentation/school/addTeacherPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,72 +10,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedTabIndex = 0; // To track the current tab
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Two tabs: Teachers and Students
+      length: 4, // Two tabs: Teachers and Students
       child: Scaffold(
-        drawer: const Drawer(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 90,
-              ),
-              Text("This is drawer"),
-            ],
-          ),
-        ),
+        drawer: AppDrawer(),
         appBar: AppBar(
+          
           title: Text('Manage'),
           actions: [
             Padding(
-                padding: const EdgeInsets.all(8),
-                child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.search,
-                      size: 30,
-                    )))
+              padding: const EdgeInsets.all(8),
+              child: IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.search,
+                  size: 30,
+                ),
+              ),
+            )
           ],
         ),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (builder) => AddTeacherPage()));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Set the button color
-                    ),
-                    child: Text('Add Teacher'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (builder) => AddTeacherPage()));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Set the button color
-                    ),
-                    child: Text('Add Student'),
-                  ),
-                ],
-              ),
-            ),
             TabBar(
+              onTap: (index) {
+                setState(() {
+                  _selectedTabIndex = index;
+                });
+              },
               tabs: [
                 Tab(text: 'Teachers'),
                 Tab(text: 'Students'),
+                Tab(text: 'Grades'),
+                Tab(text: 'Sections'),
               ],
             ),
             Expanded(
@@ -84,70 +56,73 @@ class _HomePageState extends State<HomePage> {
                   TeacherList(),
                   // Tab 2: List of Students
                   StudentList(),
+                  TeacherList(),
+                  // Tab 2: List of Students
+                  StudentList(),
                 ],
               ),
             ),
           ],
         ),
+        floatingActionButton: _getFloatingActionButton(),
       ),
     );
   }
+
+  Widget? _getFloatingActionButton() {
+    switch (_selectedTabIndex) {
+      case 0:
+        return FloatingActionButton(
+          onPressed: () {
+            // Action for adding a teacher
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddTeacherPage()),
+            );
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Add Teacher',
+        );
+      case 1:
+        return FloatingActionButton(
+          onPressed: () {
+            // Action for adding a student
+            // For now, just showing a snackbar as placeholder
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Add Student button pressed')),
+            );
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Add Student',
+        );
+      case 2:
+        return FloatingActionButton(
+          onPressed: () {
+            // Action for adding a grade
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Add Grade button pressed')),
+            );
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Add Grade',
+        );
+      case 3:
+        return FloatingActionButton(
+          onPressed: () {
+            // Action for adding a section
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Add Section button pressed')),
+            );
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Add Section',
+        );
+      default:
+        return null;
+    }
+  }
 }
 
-// Dummy teacher data
-final List<Map<String, String>> teacherData = [
-  {
-    'firstName': 'John',
-    'lastName': 'Doe',
-    'phone': '123-456-7890',
-    'email': 'john.doe@example.com',
-  },
-  {
-    'firstName': 'Jane',
-    'lastName': 'Smith',
-    'phone': '987-654-3210',
-    'email': 'jane.smith@example.com',
-  },
-  {
-    'firstName': 'John',
-    'lastName': 'Doe',
-    'phone': '123-456-7890',
-    'email': 'john.doe@example.com',
-  },
-  {
-    'firstName': 'Jane',
-    'lastName': 'Smith',
-    'phone': '987-654-3210',
-    'email': 'jane.smith@example.com',
-  },
-  {
-    'firstName': 'John',
-    'lastName': 'Doe',
-    'phone': '123-456-7890',
-    'email': 'john.doe@example.com',
-  },
-  {
-    'firstName': 'Jane',
-    'lastName': 'Smith',
-    'phone': '987-654-3210',
-    'email': 'jane.smith@example.com',
-  },
-  {
-    'firstName': 'John',
-    'lastName': 'Doe',
-    'phone': '123-456-7890',
-    'email': 'john.doe@example.com',
-  },
-  {
-    'firstName': 'Jane',
-    'lastName': 'Smith',
-    'phone': '987-654-3210',
-    'email': 'jane.smith@example.com',
-  },
-  // Add more teachers as needed
-];
-
-// Dummy student data
 final List<Map<String, String>> studentData = [
   {
     'firstName': 'Alice',

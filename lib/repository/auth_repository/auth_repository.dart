@@ -10,6 +10,10 @@ class AuthRepository {
     return authProvider.login(email, password);
   }
 
+  Future<SignupResponse> signup(String email, String name,String address, String phone) {
+    return authProvider.signup(email, address,name,phone);
+  }
+
   Future<String> refreshToken(String refreshToken) {
     return authProvider.refreshToken(refreshToken);
   }
