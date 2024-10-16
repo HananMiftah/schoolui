@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/school/school_homepage_event.dart';
+import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
+import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
+import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
+import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
+import 'package:schoolui/repository/school_homepage_repository/school_homepage_repository.dart';
+import 'package:schoolui/repository/school_homepage_repository/teacher_repository.dart';
 
 import '../bloc/signin/auth_bloc.dart';
 import '../data_provider/auth_provider/auth_provider.dart';
+import '../data_provider/school_homepage_provider/teacher_provider.dart';
 import '../repository/auth_repository/auth_repository.dart';
 import 'landing_page.dart';
 
@@ -12,8 +21,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => AuthBloc(AuthRepository(AuthProvider())),
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(AuthRepository(AuthProvider())),
+        ),
+        BlocProvider<HomeBloc>(
+          create: (_) =>
+              HomeBloc(SchoolHomepageRepository(SchoolHomepageProvider()))
+                ..add(LoadTeachers()),
+        ),
+        BlocProvider<TeacherBloc>(
+          create: (_) => TeacherBloc(
+              TeacherRepository(dataProvider: TeacherDataProvider())),
         ),
       ],
       child: MaterialApp(
@@ -23,7 +41,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => LandingPage(),
           '/login': (context) => SignInPage(),
-          // '/home-parent': (context) => HomePageParent(),
+          '/school-home': (context) => HomePage(),
           // '/home-admin': (context) => HomePageAdmin(),
         },
       ),

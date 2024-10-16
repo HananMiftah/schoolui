@@ -159,7 +159,7 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       builder: (context, state) {
         return Scaffold(
-          body: Container(
+          body: SizedBox(
             height: height,
             child: Stack(
               children: <Widget>[

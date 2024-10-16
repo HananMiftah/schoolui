@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schoolui/bloc/signin/auth_event.dart';
+import 'package:schoolui/presentation/parent/parent_homepage.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signup/signup.dart';
+import 'package:schoolui/presentation/teacher/teacher_homepage.dart';
 import '../../bloc/signin/auth_bloc.dart';
 import '../../bloc/signin/auth_state.dart';
 import 'widgets/bazier_container.dart';
@@ -69,7 +71,7 @@ class _SignInPageState extends State<SignInPage> {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => SignUpPage()));
+                    MaterialPageRoute(builder: (context) => const SignUpPage()));
               },
               child: const Text(
                 'Sign up',
@@ -169,10 +171,19 @@ class _SignInPageState extends State<SignInPage> {
           emailController.clear();
           passwordController.clear();
 
-          // Navigate to the home page
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomePage()),
+          if(state.authResponse.user!.role == "SCHOOL"){
+            Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
+          }
+          else if (state.authResponse.user!.role == "TEACHER"){
+             Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const TeacherHomepage()));
+          }
+          else{
+           Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const ParentHomepage()));}
+          
         } else if (state is AuthError) {
           setState(() {
             errorMessage = state.error;
@@ -181,7 +192,7 @@ class _SignInPageState extends State<SignInPage> {
       },
       builder: (context, state) {
         return Scaffold(
-          body: Container(
+          body: SizedBox(
             height: height,
             child: Stack(
               children: <Widget>[

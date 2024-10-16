@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/auth_response.dart';
 
 class AuthProvider {
-  final String baseUrl = "http://192.168.8.6:8000/api";
+  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<AuthResponse> login(String email, String password) async {
     final response = await http.post(
@@ -22,6 +22,7 @@ class AuthProvider {
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('email', authResponse.user!.email);
+      await prefs.setString('role', authResponse.user!.role);
       await prefs.setString('accessToken', authResponse.accessToken);
 
       return authResponse;

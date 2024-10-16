@@ -5,6 +5,8 @@ import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'signin/signin.dart';
 
 class LandingPage extends StatefulWidget {
+  const LandingPage({super.key});
+
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -25,7 +27,7 @@ class _LandingPageState extends State<LandingPage> {
     if (!seen) {
       // Not first launch, navigate to HomePage directly
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => SignInPage()),
+        MaterialPageRoute(builder: (context) => const SignInPage()),
       );
     } else {
       // First launch, set the flag to false
@@ -56,7 +58,7 @@ class _LandingPageState extends State<LandingPage> {
               onPressed: () {
                 // Navigate to home page and replace the current page
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => SignInPage()),
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
                 );
               },
               child: const Text('Get Started'),
