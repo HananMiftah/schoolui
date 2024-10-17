@@ -1,13 +1,13 @@
 class Section {
-  final int id;
+  final int? id;
   final String grade_name;
   final String section;
-  final int grade;
+  final int? grade;
 
   Section({
-    required this.id,
+    this.id,
     required this.grade_name,
-    required this.grade,
+    this.grade,
     required this.section,
   });
 

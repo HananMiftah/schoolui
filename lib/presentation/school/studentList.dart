@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schoolui/presentation/school/addStudentPage.dart';
 
 import '../../models/students.dart';
 
@@ -12,15 +13,28 @@ class StudentList extends StatelessWidget {
       itemCount: students.length,
       itemBuilder: (context, index) {
         final student = students[index];
-        return Card(
-          elevation: 4,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: ListTile(
-            leading: const Icon(Icons.person, size: 40, color: Colors.orange),
-            title: Text('${student.first_name} ${student.last_name}',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            subtitle: Text('Age: ${student.age}\nGender: ${student.gender}'),
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddStudentPage(
+                  student: student,
+                  initialSection: student.section,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: ListTile(
+              leading: const Icon(Icons.person, size: 40, color: Colors.orange),
+              title: Text('${student.first_name} ${student.last_name}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18)),
+              subtitle: Text('Age: ${student.age}\nGender: ${student.gender}'),
+            ),
           ),
         );
       },

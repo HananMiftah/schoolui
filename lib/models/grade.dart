@@ -1,12 +1,12 @@
 class Grade {
-  final int id;
+  final int? id;
   final String grade_name;
-  final int school;
+  final int? school;
 
   Grade({
-    required this.id,
+    this.id,
     required this.grade_name,
-    required this.school,
+    this.school,
   });
 
   // Map JSON data to the School object
@@ -16,5 +16,12 @@ class Grade {
       grade_name: json['grade_name'],
       school: json['school'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'grade_name': grade_name,
+      'school': school,
+    };
   }
 }
