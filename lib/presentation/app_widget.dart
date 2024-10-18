@@ -3,15 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_event.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
+import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/student/student_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/grade_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
+import 'package:schoolui/data_provider/school_homepage_provider/section_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/student_provider.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
 import 'package:schoolui/repository/school_homepage_repository/grade_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/school_homepage_repository.dart';
+import 'package:schoolui/repository/school_homepage_repository/section_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/student_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/teacher_repository.dart';
 
@@ -46,6 +49,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<GradeBloc>(
           create: (_) =>
               GradeBloc(GradeRepository(dataProvider: GradeDataProvider())),
+        ),
+        BlocProvider<SectionBloc>(
+          create: (_) =>
+              SectionBloc(SectionRepository(dataProvider: SectionDataProvider())),
         ),
       ],
       child: MaterialApp(

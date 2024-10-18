@@ -7,13 +7,16 @@ import 'package:schoolui/bloc/school_homepage/grade/grade_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/grade/grade_state.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
+import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/section/section_state.dart';
 import 'package:schoolui/bloc/school_homepage/student/student_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_event.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_state.dart';
-import 'package:schoolui/models/students.dart';
+// import 'package:schoolui/models/students.dart';
 import 'package:schoolui/presentation/core/appdrawer.dart';
 import 'package:schoolui/presentation/core/customShimmer.dart';
+import 'package:schoolui/presentation/school/addSectionPage.dart';
 import 'package:schoolui/presentation/school/addStudentPage.dart';
 import 'package:schoolui/presentation/school/gradeList.dart';
 import 'package:schoolui/presentation/school/sectionList.dart';
@@ -52,6 +55,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<SectionBloc, SectionState>(listener: (context, state) {
+          if (state is SectionSuccess) {
+            // Reload teachers when the operation is successful
+            context.read<HomeBloc>().add(LoadSections());
+          }
+        }),
         BlocListener<GradeBloc, GradeState>(listener: (context, state) {
           if (state is GradeSuccess) {
             // Reload teachers when the operation is successful
@@ -62,7 +71,9 @@ class _HomePageState extends State<HomePage> {
           listener: (context, state) {
             if (state is SectionsLoaded) {
               // Directly update the _sections variable without calling setState
-              _sections = state.sections;
+              setState(() {
+                _sections = state.sections;
+              });
             }
           },
         ),
@@ -180,6 +191,7 @@ class _HomePageState extends State<HomePage> {
                       return GradeList(grades: state.grades);
                     } else if (state is SectionsLoaded) {
                       _sections = state.sections;
+
                       return SectionList(sections: state.sections);
                     } else if (state is HomeError) {
                       return Center(child: Text(state.error));
@@ -211,6 +223,13 @@ class _HomePageState extends State<HomePage> {
           _showAddOptions("Student");
         } else if (_selectedTabIndex == 2) {
           showGradeDialog(context);
+        } else if (_selectedTabIndex == 3) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddSectionPage(),
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

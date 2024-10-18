@@ -20,4 +20,25 @@ class Section {
       grade: json['grade'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'grade_name': grade_name,
+      'grade': grade,
+      'section': section,
+    };
+  }
+  Section copyWith({
+    int? id,
+    String? section,
+    int? grade,
+    String? grade_name,
+  }) {
+    return Section(
+      id: id ?? this.id,
+      section: section ?? this.section,
+      grade: grade ?? this.grade,
+      grade_name: grade_name ?? this.grade_name,
+    );
+  }
 }
