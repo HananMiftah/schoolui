@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:schoolui/models/grade.dart';
 import 'package:schoolui/models/section.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'school_homepage_provider.dart';
 
 class SectionDataProvider {
   final String baseUrl = "http://192.168.8.11:8000/api";

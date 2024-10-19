@@ -1,17 +1,12 @@
 import 'dart:io';
 
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
-import 'package:schoolui/models/grade.dart';
-import 'package:schoolui/models/section.dart';
 import 'package:schoolui/models/students.dart';
-import 'package:schoolui/models/subject.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../models/school.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../../models/teacher.dart';
 
 class StudentDataProvider {
   final String baseUrl = "http://192.168.8.11:8000/api";
@@ -38,7 +33,7 @@ class StudentDataProvider {
       Uri.parse('$baseUrl/students/'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${accessToken}'
+        'Authorization': 'Bearer $accessToken'
       },
       body: jsonEncode(newStudent.toJson()),
     );
@@ -66,7 +61,7 @@ class StudentDataProvider {
       Uri.parse('$baseUrl/students/${student.id}/'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${accessToken}',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode(updatedStudent.toJson()),
     );
@@ -81,10 +76,10 @@ class StudentDataProvider {
     final accessToken = prefs.getString('accessToken');
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/students/${id}/'),
+      Uri.parse('$baseUrl/students/$id/'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${accessToken}',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
