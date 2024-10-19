@@ -20,6 +20,7 @@ import 'package:schoolui/presentation/core/appdrawer.dart';
 import 'package:schoolui/presentation/core/customShimmer.dart';
 import 'package:schoolui/presentation/school/addSectionPage.dart';
 import 'package:schoolui/presentation/school/addStudentPage.dart';
+import 'package:schoolui/presentation/school/assignTeacher.dart';
 import 'package:schoolui/presentation/school/gradeList.dart';
 import 'package:schoolui/presentation/school/sectionList.dart';
 import 'package:schoolui/presentation/school/subjectList.dart';
@@ -272,6 +273,21 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              ((tab == "Teacher")
+                  ? ListTile(
+                      leading: const Icon(Icons.assignment_ind),
+                      title: Text('Assign Teachers'),
+                      onTap: () {
+                        Navigator.pop(context); // Close the modal
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AssignTeacherPage()),
+                        );
+                      },
+                    )
+                  : SizedBox()),
               ListTile(
                 leading: const Icon(Icons.person_add),
                 title: Text('Add $tab'),

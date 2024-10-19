@@ -6,6 +6,7 @@ import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart'
 import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/student/student_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/subject/subject_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/teacher/assign/assign_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/grade_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
@@ -14,6 +15,7 @@ import 'package:schoolui/data_provider/school_homepage_provider/student_provider
 import 'package:schoolui/data_provider/school_homepage_provider/subject_provider.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
+import 'package:schoolui/repository/school_homepage_repository/assignTeacher_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/grade_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/school_homepage_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/section_repository.dart';
@@ -24,6 +26,7 @@ import 'package:schoolui/repository/school_homepage_repository/teacher_repositor
 import '../bloc/school_homepage/grade/grade_bloc.dart';
 import '../bloc/signin/auth_bloc.dart';
 import '../data_provider/auth_provider/auth_provider.dart';
+import '../data_provider/school_homepage_provider/teacherAssignment_provider.dart';
 import '../data_provider/school_homepage_provider/teacher_provider.dart';
 import '../repository/auth_repository/auth_repository.dart';
 import 'landing_page.dart';
@@ -60,6 +63,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<SubjectBloc>(
           create: (_) => SubjectBloc(
               SubjectRepository(dataProvider: SubjectDataProvider())),
+        ),
+        BlocProvider<TeacherAssignmentBloc>(
+          create: (_) => TeacherAssignmentBloc(TeacherAssignmentRepository(
+              dataProvider: TeacherAssignmentProvider())),
         ),
       ],
       child: MaterialApp(
