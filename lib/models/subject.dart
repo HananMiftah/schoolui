@@ -1,12 +1,12 @@
 class Subject {
-  final int id;
+  final int? id;
   final String subject;
-  final int school;
+  final int? school;
 
   Subject({
-    required this.id,
+    this.id,
     required this.subject,
-    required this.school,
+    this.school,
   });
 
   // Map JSON data to the School object
@@ -16,5 +16,11 @@ class Subject {
       subject: json['subject'],
       school: json['school'],
     );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'subject': subject,
+      'school': school,
+    };
   }
 }

@@ -10,6 +10,8 @@ import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart'
 import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/section/section_state.dart';
 import 'package:schoolui/bloc/school_homepage/student/student_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/subject/subject_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/subject/subject_state.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_event.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_state.dart';
@@ -20,6 +22,7 @@ import 'package:schoolui/presentation/school/addSectionPage.dart';
 import 'package:schoolui/presentation/school/addStudentPage.dart';
 import 'package:schoolui/presentation/school/gradeList.dart';
 import 'package:schoolui/presentation/school/sectionList.dart';
+import 'package:schoolui/presentation/school/subjectList.dart';
 
 import '../../bloc/school_homepage/school/school_homepage_event.dart';
 import '../../bloc/school_homepage/student/student_event.dart';
@@ -29,6 +32,7 @@ import '../../models/teacher.dart';
 import 'addTeacherPage.dart';
 import 'gradeDialog.dart';
 import 'studentList.dart';
+import 'subjectDialog.dart';
 import 'teacherList.dart';
 // import 'addTeacherPage.dart';
 
@@ -55,6 +59,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<SubjectBloc, SubjectState>(listener: (context, state) {
+          if (state is SubjectSuccess) {
+            // Reload teachers when the operation is successful
+            context.read<HomeBloc>().add(LoadSubjects());
+          }
+        }),
         BlocListener<SectionBloc, SectionState>(listener: (context, state) {
           if (state is SectionSuccess) {
             // Reload teachers when the operation is successful
@@ -142,7 +152,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
       child: DefaultTabController(
-        length: 4, // 4 tabs: Teachers, Students, Grades, Sections
+        length: 5, // 4 tabs: Teachers, Students, Grades, Sections
         child: Scaffold(
           drawer: const AppDrawer(),
           appBar: AppBar(
@@ -157,6 +167,9 @@ class _HomePageState extends State<HomePage> {
           body: Column(
             children: [
               TabBar(
+                indicatorColor: Colors.orange,
+                labelColor: Colors.black,
+                isScrollable: true,
                 onTap: (index) {
                   setState(() {
                     _selectedTabIndex = index;
@@ -169,6 +182,8 @@ class _HomePageState extends State<HomePage> {
                     context.read<HomeBloc>().add(LoadGrades());
                   } else if (index == 3) {
                     context.read<HomeBloc>().add(LoadSections());
+                  } else if (index == 4) {
+                    context.read<HomeBloc>().add(LoadSubjects());
                   }
                 },
                 tabs: const [
@@ -176,6 +191,7 @@ class _HomePageState extends State<HomePage> {
                   Tab(text: 'Students'),
                   Tab(text: 'Grades'),
                   Tab(text: 'Sections'),
+                  Tab(text: 'Subjects'),
                 ],
               ),
               Expanded(
@@ -191,8 +207,9 @@ class _HomePageState extends State<HomePage> {
                       return GradeList(grades: state.grades);
                     } else if (state is SectionsLoaded) {
                       _sections = state.sections;
-
                       return SectionList(sections: state.sections);
+                    } else if (state is SubjectsLoaded) {
+                      return SubjectList(subjects: state.subjects);
                     } else if (state is HomeError) {
                       return Center(child: Text(state.error));
                     }
@@ -230,6 +247,8 @@ class _HomePageState extends State<HomePage> {
               builder: (context) => AddSectionPage(),
             ),
           );
+        } else if (_selectedTabIndex == 4) {
+          showSubjectDialog(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
