@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/grade/grade_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/grade/grade_state.dart';
+import 'package:schoolui/bloc/school_homepage/parent/parent_bloc.dart';
+import 'package:schoolui/bloc/school_homepage/parent/parent_event.dart';
+import 'package:schoolui/bloc/school_homepage/parent/parent_state.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
 import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
@@ -18,10 +21,12 @@ import 'package:schoolui/bloc/school_homepage/teacher/teacher_state.dart';
 // import 'package:schoolui/models/students.dart';
 import 'package:schoolui/presentation/core/appdrawer.dart';
 import 'package:schoolui/presentation/core/customShimmer.dart';
+import 'package:schoolui/presentation/school/addParentPage.dart';
 import 'package:schoolui/presentation/school/addSectionPage.dart';
 import 'package:schoolui/presentation/school/addStudentPage.dart';
 import 'package:schoolui/presentation/school/assignTeacher.dart';
 import 'package:schoolui/presentation/school/gradeList.dart';
+import 'package:schoolui/presentation/school/parentList.dart';
 import 'package:schoolui/presentation/school/sectionList.dart';
 import 'package:schoolui/presentation/school/subjectList.dart';
 
@@ -151,9 +156,44 @@ class _HomePageState extends State<HomePage> {
             }
           },
         ),
+        BlocListener<ParentBloc, ParentState>(
+          listener: (context, state) {
+            if (state is ParentSuccess) {
+              // Reload students when the operation is successful
+              context.read<HomeBloc>().add(LoadParents());
+            }
+            // Handle other student states if necessary, e.g., showing errors
+            if (state is ParentFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Error loading parents: ${state.error}')),
+              );
+            }
+            if (state is ParentUploading) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Uploading file...'),
+                  duration: Duration(
+                      minutes: 5), // Keep SnackBar showing until dismissed
+                ),
+              );
+            } else if (state is ParentUploadSuccess) {
+              context.read<HomeBloc>().add(LoadParents());
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('File uploaded successfully!')),
+              );
+            } else if (state is ParentFailure) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Upload failed: //${state.error}')),
+              );
+            }
+          },
+        ),
       ],
       child: DefaultTabController(
-        length: 5, // 4 tabs: Teachers, Students, Grades, Sections
+        length: 6, // 4 tabs: Teachers, Students, Grades, Sections
         child: Scaffold(
           drawer: const AppDrawer(),
           appBar: AppBar(
@@ -185,6 +225,8 @@ class _HomePageState extends State<HomePage> {
                     context.read<HomeBloc>().add(LoadSections());
                   } else if (index == 4) {
                     context.read<HomeBloc>().add(LoadSubjects());
+                  } else if (index == 5) {
+                    context.read<HomeBloc>().add(LoadParents());
                   }
                 },
                 tabs: const [
@@ -193,6 +235,7 @@ class _HomePageState extends State<HomePage> {
                   Tab(text: 'Grades'),
                   Tab(text: 'Sections'),
                   Tab(text: 'Subjects'),
+                  Tab(text: 'Parents'),
                 ],
               ),
               Expanded(
@@ -211,6 +254,8 @@ class _HomePageState extends State<HomePage> {
                       return SectionList(sections: state.sections);
                     } else if (state is SubjectsLoaded) {
                       return SubjectList(subjects: state.subjects);
+                    } else if (state is ParentsLoaded) {
+                      return ParentList(parents: state.parents);
                     } else if (state is HomeError) {
                       return Center(child: Text(state.error));
                     }
@@ -250,6 +295,8 @@ class _HomePageState extends State<HomePage> {
           );
         } else if (_selectedTabIndex == 4) {
           showSubjectDialog(context);
+        } else if (_selectedTabIndex == 5) {
+          _showAddOptions("Parent");
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -298,6 +345,11 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(builder: (context) => AddTeacherPage()),
                     );
+                  } else if (tab == "Parent") {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddParentPage()),
+                    );
                   } else {
                     Navigator.push(
                       context,
@@ -333,6 +385,9 @@ class _HomePageState extends State<HomePage> {
       if (result != null && tab == "Teacher") {
         final file = File(result.files.single.path!);
         context.read<TeacherBloc>().add(UploadTeacherExcel(file));
+      } else if (result != null && tab == "Parent") {
+        final file = File(result.files.single.path!);
+        context.read<ParentBloc>().add(UploadParentExcelEvent(file));
       }
     }
 

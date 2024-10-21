@@ -1,5 +1,6 @@
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
 import 'package:schoolui/models/grade.dart';
+import 'package:schoolui/models/parent.dart';
 import 'package:schoolui/models/section.dart';
 import 'package:schoolui/models/students.dart';
 import 'package:schoolui/models/subject.dart';
@@ -34,5 +35,9 @@ class SchoolHomepageRepository {
 
   Future<List<Subject>> getSubjects() {
     return homeProvider.getSubjects();
+  }
+
+  Future<List<Parent>> getParents() {
+    return homeProvider.getParents();
   }
 }

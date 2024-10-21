@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
+import 'package:schoolui/presentation/core/themeProvider.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +19,6 @@ class AppDrawer extends StatefulWidget {
 
 class _AppDrawerState extends State<AppDrawer> {
   String? userEmail;
-  bool isDarkMode = false;
 
   @override
   void initState() {
@@ -40,20 +41,21 @@ class _AppDrawerState extends State<AppDrawer> {
     await prefs.remove('accessToken');
 
     // Redirect to Sign-In Page
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => const SignInPage()));
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const SignInPage()));
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    bool isDarkMode = themeProvider.themeMode == ThemeMode.dark;
     return Drawer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Color.fromARGB(
-                  255, 216, 131, 2), // Add your theme color
+              color: Color.fromARGB(255, 216, 131, 2), // Add your theme color
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,15 +78,15 @@ class _AppDrawerState extends State<AppDrawer> {
                 //       ),
                 //     );
                 //     }
-                    // return const 
-                    Text(
-                      "Your Name",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    // );
+                // return const
+                Text(
+                  "Your Name",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  // );
                   // },
                 ),
                 Text(
@@ -116,9 +118,7 @@ class _AppDrawerState extends State<AppDrawer> {
             title: const Text("Dark Mode"),
             value: isDarkMode,
             onChanged: (bool value) {
-              setState(() {
-                isDarkMode = value; // Toggle dark mode state
-              });
+              themeProvider.toggleTheme(value); // Toggle theme mode
             },
           ),
           ListTile(

@@ -1,5 +1,6 @@
 
 import 'package:schoolui/models/grade.dart';
+import 'package:schoolui/models/parent.dart';
 import 'package:schoolui/models/school.dart';
 import 'package:schoolui/models/section.dart';
 import 'package:schoolui/models/students.dart';
@@ -57,6 +58,15 @@ class SubjectsLoaded extends SchoolHomepageState {
 
   @override
   List<Object?> get props => [subjects];
+}
+
+class ParentsLoaded extends SchoolHomepageState {
+  final List<Parent> parents;
+
+  ParentsLoaded({required this.parents});
+
+  @override
+  List<Object?> get props => [parents];
 }
 
 // Error state

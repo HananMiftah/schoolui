@@ -4,6 +4,7 @@ import 'package:schoolui/models/students.dart';
 import 'package:schoolui/models/subject.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/parent.dart';
 import '../../models/school.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -168,6 +169,30 @@ class SchoolHomepageProvider {
       return subjects;
     } else {
       throw Exception('Failed to fetch subjects data');
+    }
+  }
+
+  Future<List<Parent>> getParents() async {
+    // Fetch school data using the saved email
+    final school = await getSchoolData();
+    final school_id = school.id;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final accessToken = prefs.getString('accessToken');
+
+    final response = await http
+        .get(Uri.parse('$baseUrl/schools/$school_id/get-parents/'), headers: {
+      'Accept': 'Application/json',
+      'Authorization': 'Bearer ${accessToken}',
+    });
+
+    if (response.statusCode == 200) {
+      final parsed = json.decode(response.body);
+      List<Parent> parents =
+          List<Parent>.from(parsed.map((e) => Parent.fromJson(e)));
+      return parents;
+    } else {
+      throw Exception('Failed to fetch parents data');
     }
   }
 }
