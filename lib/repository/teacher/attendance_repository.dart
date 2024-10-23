@@ -12,7 +12,7 @@ class AttendanceRepository {
   }
 
   Future<void> postAttendance(
-      List<Attendance> attendanceList) async {
+      List<AttendancePost> attendanceList) async {
     return await dataProvider.postAttendance(attendanceList);
   }
 }

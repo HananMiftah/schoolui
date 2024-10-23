@@ -5,7 +5,6 @@ import '../../models/attendance.dart';
 import '../constants.dart';
 
 class AttendanceDataProvider {
-
   Future<List<Attendance>> fetchAttendance(
       int? sectionId, DateTime date) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -32,18 +31,23 @@ class AttendanceDataProvider {
     }
   }
 
-  Future<void> postAttendance(List<Attendance> attendanceList) async {
+  Future<void> postAttendance(List<AttendancePost> attendanceList) async {
     final url = '$baseUrl/attendance/';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    final accessToken = prefs.getString('accessToken');
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer ${accessToken}',
+      },
       body: jsonEncode(
           attendanceList.map((attendance) => attendance.toJson()).toList()),
     );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to post attendance');
+    print(response.body);
+    if (response.statusCode != 201) {
+      throw Exception('Failed to post attendance. Error: ${response.body}');
     }
   }
 }

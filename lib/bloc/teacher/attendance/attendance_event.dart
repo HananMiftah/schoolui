@@ -23,7 +23,7 @@ class FetchAttendance extends AttendanceEvent {
 
 // Event to post attendance
 class PostAttendance extends AttendanceEvent {
-  final List<Attendance> attendanceList;
+  final List<AttendancePost> attendanceList;
 
   const PostAttendance(this.attendanceList);
 
