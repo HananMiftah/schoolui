@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/auth_response.dart';
+import '../constants.dart';
 
 class AuthProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
+  
 
   Future<AuthResponse> login(String email, String password) async {
     final response = await http.post(

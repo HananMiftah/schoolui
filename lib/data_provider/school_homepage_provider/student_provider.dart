@@ -7,9 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../constants.dart';
+
 
 class StudentDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<void> addStudent(Student student) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

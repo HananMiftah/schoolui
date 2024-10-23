@@ -5,8 +5,9 @@ import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_
 import 'package:schoolui/models/parent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../constants.dart';
+
 class ParentDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<void> addParent(Parent parent) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

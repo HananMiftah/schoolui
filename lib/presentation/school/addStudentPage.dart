@@ -85,7 +85,6 @@ class _AddStudentPageState extends State<AddStudentPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Trigger the LoadStudents event when navigating back
         context.read<HomeBloc>().add(LoadStudents());
         return true;
       },

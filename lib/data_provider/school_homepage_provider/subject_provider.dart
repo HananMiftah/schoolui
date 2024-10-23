@@ -4,10 +4,10 @@ import 'package:schoolui/models/grade.dart';
 import 'package:schoolui/models/subject.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../constants.dart';
 import 'school_homepage_provider.dart';
 
 class SubjectDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<void> addSubject(Subject subject) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

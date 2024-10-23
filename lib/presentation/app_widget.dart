@@ -4,18 +4,21 @@ import 'package:provider/provider.dart';
 import 'package:schoolui/bloc/school_homepage/parent/parent_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_event.dart';
-import 'package:schoolui/bloc/school_homepage/school/school_homepage_state.dart';
 import 'package:schoolui/bloc/school_homepage/section/section_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/student/student_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/subject/subject_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/assign/assign_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
+import 'package:schoolui/bloc/teacher/attendance/attendance_bloc.dart';
+import 'package:schoolui/bloc/teacher/sectionStudent/sectionStudent_bloc.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/grade_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/parent_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/section_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/student_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/subject_provider.dart';
+import 'package:schoolui/data_provider/teacher/attendance_provider.dart';
+import 'package:schoolui/data_provider/teacher/sectionStudent_provider.dart';
 import 'package:schoolui/data_provider/teacher/teacherpage_provider.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
@@ -27,6 +30,8 @@ import 'package:schoolui/repository/school_homepage_repository/section_repositor
 import 'package:schoolui/repository/school_homepage_repository/student_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/subject_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/teacher_repository.dart';
+import 'package:schoolui/repository/teacher/attendance_repository.dart';
+import 'package:schoolui/repository/teacher/sectionStudent_repository.dart';
 import 'package:schoolui/repository/teacher/teacherpage_repository.dart';
 
 import '../bloc/school_homepage/grade/grade_bloc.dart';
@@ -85,6 +90,16 @@ class MyApp extends StatelessWidget {
           create: (_) => TeacherPageBloc(
               teacherRepository: TeacherPageRepository(
                   dataProvider: TeacherPageDataProvider())),
+        ),
+        BlocProvider<SectionStudentBloc>(
+          create: (_) => SectionStudentBloc(
+              repository: SectionStudentPageRepository(
+                  dataProvider: SectionStudentDataProvider())),
+        ),
+        BlocProvider<AttendanceBloc>(
+          create: (_) => AttendanceBloc(
+              repository:
+                  AttendanceRepository(dataProvider: AttendanceDataProvider())),
         ),
       ],
       child: MaterialApp(

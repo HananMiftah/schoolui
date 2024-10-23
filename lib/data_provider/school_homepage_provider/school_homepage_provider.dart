@@ -10,9 +10,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../models/teacher.dart';
+import '../constants.dart';
 
 class SchoolHomepageProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<School> getSchoolData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -5,8 +5,9 @@ import 'package:schoolui/models/teacherSection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../constants.dart';
+
 class TeacherPageDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<Teacher> getTeacher() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

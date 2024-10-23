@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:schoolui/models/grade.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../constants.dart';
 import 'school_homepage_provider.dart';
 
 class GradeDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<void> addGrade(Grade grade) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

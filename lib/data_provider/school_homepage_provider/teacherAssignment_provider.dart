@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/teacherAssignment.dart';
+import '../constants.dart';
 
 class TeacherAssignmentProvider {
-  final String baseUrl = 'http://192.168.8.11:8000/api';
 
   Future<void> assignTeacher(TeacherAssignment assignment) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -4,8 +4,9 @@ import 'package:schoolui/models/section.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../constants.dart';
+
 class SectionDataProvider {
-  final String baseUrl = "http://192.168.8.11:8000/api";
 
   Future<void> addSection(Section section) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

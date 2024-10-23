@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schoolui/presentation/core/customShimmer.dart';
 import '../../bloc/teacher/teacherpage_bloc.dart';
 import '../../bloc/teacher/teacherpage_state.dart';
 import '../../models/teacherSection.dart';
@@ -8,23 +9,32 @@ import 'studentspage.dart';
 class SectionsPage extends StatelessWidget {
   const SectionsPage({super.key});
 
+  // Function to remove duplicate sections based on 'gradeName' and 'sectionName'
+  List<TeacherSection> _removeDuplicateSections(List<TeacherSection> sections) {
+    final seenSections =
+        <String>{}; // Set to store unique grade-section combinations
+    return sections.where((section) {
+      // Create a unique identifier by combining gradeName and sectionName
+      final uniqueKey =
+          '${section.gradeName}-${section.sectionName}'.toLowerCase();
+      if (seenSections.contains(uniqueKey)) {
+        return false; // If the combination already exists, skip this section
+      } else {
+        seenSections.add(uniqueKey); // Otherwise, add to seen set
+        return true; // Include this section
+      }
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TeacherPageBloc, TeacherPageState>(
       builder: (context, state) {
         if (state is TeacherLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomShimmer());
         } else if (state is TeacherSectionsLoaded) {
-          // Remove duplicate sections based on the 'section' field
-          final uniqueSections = <TeacherSection>[];
-          final seenSections = <String>{}; // Set to track seen section names
-
-          for (var section in state.sections) {
-            if (!seenSections.contains(section.sectionId)) {
-              seenSections.add(section.sectionName); // Add section to seen set
-              uniqueSections.add(section); // Add unique section to the list
-            }
-          }
+          // Apply the duplicate removal logic based on gradeName and sectionName
+          final uniqueSections = _removeDuplicateSections(state.sections);
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
