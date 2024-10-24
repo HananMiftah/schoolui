@@ -12,6 +12,7 @@ import '../../models/teacherSection.dart';
 import '../../models/students.dart';
 import '../../presentation/core/customShimmer.dart';
 
+// At the top of your file
 class AttendancePage extends StatefulWidget {
   final TeacherSection section;
 
@@ -24,14 +25,15 @@ class AttendancePage extends StatefulWidget {
 class _AttendancePageState extends State<AttendancePage> {
   final Map<int, String> _attendanceStatus = {};
   final List<String> _attendanceOptions = ["PRESENT", "ABSENT", "LATE"];
-  DateTime _selectedDate = DateTime.now(); // Default to today
+  DateTime _selectedDate = DateTime.now();
   late TeacherSection _currentSection;
   late List<Student> _students = [];
+  bool _isStudentsFetched = false; // Flag to check if students are fetched
+
   @override
   void initState() {
     super.initState();
-    _currentSection = widget.section; // Initialize with the current section
-    // Fetch attendance for the current date
+    _currentSection = widget.section;
     _fetchAttendanceForDate(_selectedDate);
   }
 
@@ -43,19 +45,21 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   void _fetchStudentsForSection() {
-    context
-        .read<SectionStudentBloc>()
-        .add(FetchStudents(_currentSection.sectionId));
+    if (!_isStudentsFetched) {
+      // Only fetch if not already done
+      context
+          .read<SectionStudentBloc>()
+          .add(FetchStudents(_currentSection.sectionId));
+    }
   }
 
   @override
   void didUpdateWidget(covariant AttendancePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Check if the section has changed
     if (oldWidget.section.id != widget.section.id) {
-      // Update the current section and fetch attendance for the new section
       setState(() {
         _currentSection = widget.section;
+        _isStudentsFetched = false; // Reset flag when section changes
       });
       _fetchAttendanceForDate(_selectedDate);
     }
@@ -75,91 +79,75 @@ class _AttendancePageState extends State<AttendancePage> {
         actions: [
           TextButton(
             onPressed: () async {
-              // Show the date picker
               final selectedDate = await _selectDate(context);
               if (selectedDate != null) {
                 setState(() {
                   _selectedDate = selectedDate;
                 });
-                // Fetch attendance for the selected date
                 _fetchAttendanceForDate(_selectedDate);
               }
             },
             child: Text(
-              DateFormat.yMMMMd()
-                  .format(_selectedDate), // Display the selected date
+              DateFormat.yMMMMd().format(_selectedDate),
               style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
       ),
-      body: BlocBuilder<AttendanceBloc, AttendanceState>(
-        builder: (context, state) {
-          if (state is AttendanceLoading) {
-            return const Center(child: CustomShimmer());
-          } else if (state is AttendanceLoaded) {
-            if (state.attendanceList.isEmpty) {
-              // Fetch students if attendanceList is empty
-              _fetchStudentsForSection();
-              return BlocBuilder<SectionStudentBloc, SectionStudentState>(
-                builder: (context, studentState) {
-                  if (studentState is StudentLoaded) {
-                    _students = studentState.students;
-
-                    // Initialize attendance status as Present for all students
-                    for (var student in _students) {
-                      _attendanceStatus[student.id!] =
-                          _attendanceOptions[0]; // Use student.id
-                    }
-                    return _buildAttendanceList(_students);
-                  } else if (studentState is StudentError) {
-                    return Center(child: Text(studentState.message));
-                  } else if (studentState is StudentLoading) {
-                    return CustomShimmer();
-                  } else {
-                    return const Center(child: Text('No students available'));
-                  }
-                },
-              );
-            } else {
-              // Initialize attendance status with loaded attendance
-              for (var attendance in state.attendanceList) {
-                _attendanceStatus[attendance.studentId] =
-                    attendance.status; // Use attendance.studentId
-              }
-
-              // Create the students list based on the attendance list
-              _students = state.attendanceList.map((attendance) {
-                return Student(
-                  id: attendance.studentId,
-                  first_name: attendance.studentFirst,
-                  last_name: attendance.studentLast,
-                  age: 0, // Adjust as necessary
-                  section: 0, // Adjust as necessary
-                  gender: "",
-                  student_id: "",
-                );
-              }).toList();
-              return _buildAttendanceList(_students);
-            }
-          } else if (state is AttendanceError) {
-            return Center(child: Text(state.message));
-          } else {
-            return const Center(child: Text('No students available'));
+      body: BlocListener<AttendanceBloc, AttendanceState>(
+        listener: (context, state) {
+          if (state is AttendancePosted) {
+            // Attendance saved successfully, fetch attendance for the current date again
+            _fetchAttendanceForDate(_selectedDate);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Attendance successfully saved!'),
+                duration: Duration(
+                    seconds: 2), // Duration the snackbar will be visible
+                backgroundColor: Colors.green, // Snackbar background color
+              ),
+            );
           }
         },
+        child: BlocBuilder<AttendanceBloc, AttendanceState>(
+          builder: (context, state) {
+            if (state is AttendanceLoading) {
+              return const Center(child: CustomShimmer());
+            } else if (state is AttendanceLoaded) {
+              if (state.attendanceList.isEmpty) {
+                _fetchStudentsForSection();
+                return BlocBuilder<SectionStudentBloc, SectionStudentState>(
+                  builder: (context, studentState) {
+                    if (studentState is StudentLoaded) {
+                      _students = studentState.students;
+                      _initializeAttendanceStatus();
+                      return _buildAttendanceList(_students);
+                    } else if (studentState is StudentError) {
+                      return Center(child: Text(studentState.message));
+                    } else if (studentState is StudentLoading) {
+                      return CustomShimmer();
+                    }
+                    return const Center(child: Text('No students available'));
+                  },
+                );
+              } else {
+                _initializeAttendanceStatusFromLoaded(state);
+                return _buildAttendanceList(_students);
+              }
+            } else if (state is AttendanceError) {
+              return Center(child: Text(state.message));
+            }
+            return const Center(child: Text('No students available'));
+          },
+        ),
       ),
-      // Show the "Save Attendance" button if the selected date is today
       bottomNavigationBar: isToday
           ? Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {
-                  // Handle save attendance logic
-                  _saveAttendance();
-                },
+                onPressed: _saveAttendance,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, // Button color
+                  backgroundColor: Colors.orange,
                 ),
                 child: const Text(
                   'Save Attendance',
@@ -167,11 +155,40 @@ class _AttendancePageState extends State<AttendancePage> {
                 ),
               ),
             )
-          : null, // No button if the date is not today
+          : null,
     );
   }
 
-  // Date picker to select attendance date
+  // Initialize attendance status based on loaded data
+  void _initializeAttendanceStatus() {
+    _attendanceStatus.clear(); // Clear previous statuses
+    for (var student in _students) {
+      _attendanceStatus[student.id!] =
+          _attendanceOptions[0]; // Default to PRESENT
+    }
+    _isStudentsFetched = true; // Mark students as fetched
+  }
+
+  void _initializeAttendanceStatusFromLoaded(AttendanceLoaded state) {
+    _attendanceStatus.clear(); // Clear previous statuses
+    for (var attendance in state.attendanceList) {
+      _attendanceStatus[attendance.studentId] = attendance.status;
+    }
+
+    // Create the students list based on the attendance list
+    _students = state.attendanceList.map((attendance) {
+      return Student(
+        id: attendance.studentId,
+        first_name: attendance.studentFirst,
+        last_name: attendance.studentLast,
+        age: 0,
+        section: 0,
+        gender: "",
+        student_id: "",
+      );
+    }).toList();
+  }
+
   Future<DateTime?> _selectDate(BuildContext context) {
     return showDatePicker(
       context: context,
@@ -181,7 +198,6 @@ class _AttendancePageState extends State<AttendancePage> {
     );
   }
 
-  // Build the attendance list with the updated card design
   Widget _buildAttendanceList(List<Student> students) {
     final isToday = DateFormat('yyyy-MM-dd').format(_selectedDate) ==
         DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -190,15 +206,12 @@ class _AttendancePageState extends State<AttendancePage> {
       itemCount: students.length,
       itemBuilder: (context, index) {
         final student = students[index];
-        final studentId = student.id ?? -1; // Handle null ID
+        final studentId = student.id ?? -1;
         if (studentId == -1) {
-          return const SizedBox.shrink(); // Skip if no ID
+          return const SizedBox.shrink();
         }
 
-        // Default to Present if not set
         _attendanceStatus.putIfAbsent(studentId, () => _attendanceOptions[0]);
-
-        // Use ValueNotifier to track dropdown selection for individual student
         ValueNotifier<String> selectedStatus =
             ValueNotifier<String>(_attendanceStatus[studentId]!);
 
@@ -224,10 +237,7 @@ class _AttendancePageState extends State<AttendancePage> {
                           }).toList(),
                           onChanged: (String? newStatus) {
                             if (newStatus != null) {
-                              // Update the ValueNotifier, not the entire widget tree
                               selectedStatus.value = newStatus;
-
-                              // Update attendance status map for the student
                               _attendanceStatus[studentId] = newStatus;
                             }
                           },
@@ -248,25 +258,17 @@ class _AttendancePageState extends State<AttendancePage> {
     );
   }
 
-  // Handle saving attendance logic
   void _saveAttendance() {
     List<AttendancePost> attendanceList = [];
-
-    // Iterate over the attendance status map and create attendance objects
     _attendanceStatus.forEach((studentId, status) {
       attendanceList.add(AttendancePost(
           studentId: studentId,
-          date: DateFormat('yyyy-MM-dd').format(_selectedDate), // Format date
+          date: DateFormat('yyyy-MM-dd').format(_selectedDate),
           status: status,
           sectionId: _currentSection.id));
     });
 
-    // Call the PostAttendance event with the list of attendance objects
     context.read<AttendanceBloc>().add(PostAttendance(attendanceList));
-
     print("Saving attendance...");
-    context
-        .read<AttendanceBloc>()
-        .add(FetchAttendance(_currentSection.id, _selectedDate));
   }
 }

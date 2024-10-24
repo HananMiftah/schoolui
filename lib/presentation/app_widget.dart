@@ -36,6 +36,7 @@ import 'package:schoolui/repository/teacher/teacherpage_repository.dart';
 
 import '../bloc/school_homepage/grade/grade_bloc.dart';
 import '../bloc/signin/auth_bloc.dart';
+import '../bloc/teacher/attendance/attendanceState_bloc.dart';
 import '../bloc/teacher/teacherpage_bloc.dart';
 import '../data_provider/auth_provider/auth_provider.dart';
 import '../data_provider/school_homepage_provider/teacherAssignment_provider.dart';
@@ -101,6 +102,8 @@ class MyApp extends StatelessWidget {
               repository:
                   AttendanceRepository(dataProvider: AttendanceDataProvider())),
         ),
+        BlocProvider<AttendanceStatusBloc>(
+            create: (_) => AttendanceStatusBloc()),
       ],
       child: MaterialApp(
         title: 'School App',

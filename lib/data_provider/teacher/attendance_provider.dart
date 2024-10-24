@@ -46,7 +46,7 @@ class AttendanceDataProvider {
           attendanceList.map((attendance) => attendance.toJson()).toList()),
     );
     print(response.body);
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to post attendance. Error: ${response.body}');
     }
   }
