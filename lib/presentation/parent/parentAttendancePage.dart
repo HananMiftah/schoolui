@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import '../../bloc/parent/parentpage_bloc.dart';
 import '../../bloc/parent/parentpage_event.dart';
 import '../../bloc/parent/parentpage_state.dart';
@@ -45,6 +44,14 @@ class _ParentAttendancePageState extends State<ParentAttendancePage> {
     );
   }
 
+  void _fetchAttendance() {
+    if (_selectedStudent != null) {
+      context.read<ParentPageBloc>().add(LoadStudentAttendance(
+          _selectedStudent!.id!,
+          DateFormat('yyyy-MM-dd').format(_selectedDate)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ParentPageBloc, ParentPageState>(
@@ -75,7 +82,9 @@ class _ParentAttendancePageState extends State<ParentAttendancePage> {
                           onChanged: (Student? newValue) {
                             setState(() {
                               _selectedStudent = newValue;
+                              // Clear previous attendance when student changes
                             });
+                            _fetchAttendance(); // Fetch attendance for the new student
                           },
                           items: _students.map<DropdownMenuItem<Student>>(
                               (Student student) {
@@ -96,7 +105,7 @@ class _ParentAttendancePageState extends State<ParentAttendancePage> {
                             setState(() {
                               _selectedDate = selectedDate;
                             });
-                            // Optionally fetch attendance for the selected date
+                            _fetchAttendance(); // Fetch attendance for the selected date
                           }
                         },
                         child: Text(
@@ -107,12 +116,55 @@ class _ParentAttendancePageState extends State<ParentAttendancePage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Any additional content can go here
+                  // Display attendance if available
+                  Expanded(
+                    child: AttendanceList(
+                      selectedStudent: _selectedStudent,
+                      selectedDate: _selectedDate,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         );
+      },
+    );
+  }
+}
+
+class AttendanceList extends StatelessWidget {
+  final Student? selectedStudent;
+  final DateTime selectedDate;
+
+  const AttendanceList({
+    Key? key,
+    required this.selectedStudent,
+    required this.selectedDate,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ParentPageBloc, ParentPageState>(
+      builder: (context, state) {
+        if (state is ParentAttendanceLoaded) {
+          final attendanceRecords = state.attendanceRecords;
+
+          return ListView.builder(
+            itemCount: attendanceRecords.length,
+            itemBuilder: (context, index) {
+              final record = attendanceRecords[index];
+              return ListTile(
+                title: Text(
+                    '${record.grade} - ${record.section} - ${record.subject} - ${record.status}'),
+              );
+            },
+          );
+        } else if (state is ParentError) {
+          return Center(child: Text(state.message));
+        }
+
+        return const Text('No attendance records found.');
       },
     );
   }
