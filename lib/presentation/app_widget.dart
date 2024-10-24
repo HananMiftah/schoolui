@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:schoolui/bloc/parent/parentpage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/parent/parent_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/school/school_homepage_event.dart';
@@ -11,6 +12,7 @@ import 'package:schoolui/bloc/school_homepage/teacher/assign/assign_bloc.dart';
 import 'package:schoolui/bloc/school_homepage/teacher/teacher_bloc.dart';
 import 'package:schoolui/bloc/teacher/attendance/attendance_bloc.dart';
 import 'package:schoolui/bloc/teacher/sectionStudent/sectionStudent_bloc.dart';
+import 'package:schoolui/data_provider/parent/parentpage_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/grade_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/parent_provider.dart';
 import 'package:schoolui/data_provider/school_homepage_provider/school_homepage_provider.dart';
@@ -22,6 +24,7 @@ import 'package:schoolui/data_provider/teacher/sectionStudent_provider.dart';
 import 'package:schoolui/data_provider/teacher/teacherpage_provider.dart';
 import 'package:schoolui/presentation/school/school_homepage.dart';
 import 'package:schoolui/presentation/signin/signin.dart';
+import 'package:schoolui/repository/parent/parentpage_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/assignTeacher_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/grade_repository.dart';
 import 'package:schoolui/repository/school_homepage_repository/parent_repository.dart';
@@ -101,6 +104,11 @@ class MyApp extends StatelessWidget {
           create: (_) => AttendanceBloc(
               repository:
                   AttendanceRepository(dataProvider: AttendanceDataProvider())),
+        ),
+        BlocProvider<ParentPageBloc>(
+          create: (_) => ParentPageBloc(
+              parentRepository:
+                  ParentPageRepository(dataProvider: ParentPageDataProvider())),
         ),
         BlocProvider<AttendanceStatusBloc>(
             create: (_) => AttendanceStatusBloc()),
