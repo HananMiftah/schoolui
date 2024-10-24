@@ -29,12 +29,38 @@ class _AttendancePageState extends State<AttendancePage> {
   late TeacherSection _currentSection;
   late List<Student> _students = [];
   bool _isStudentsFetched = false; // Flag to check if students are fetched
+  List<Student> _filteredStudents = []; // List for filtered students
+  TextEditingController _searchController =
+      TextEditingController(); // Controller for the search bar
 
   @override
   void initState() {
     super.initState();
     _currentSection = widget.section;
     _fetchAttendanceForDate(_selectedDate);
+
+    _searchController.addListener(() {
+      setState(() {
+        _filterStudents(_searchController.text); // Filter students dynamically
+      });
+    });
+  }
+
+  void _filterStudents(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredStudents =
+            _students; // Reset filtered list to all students in section
+      } else {
+        _filteredStudents = _students
+            .where((student) =>
+                student.first_name
+                    .toLowerCase()
+                    .contains(query.toLowerCase()) ||
+                student.last_name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   void _fetchAttendanceForDate(DateTime date) {
@@ -59,7 +85,9 @@ class _AttendancePageState extends State<AttendancePage> {
     if (oldWidget.section.id != widget.section.id) {
       setState(() {
         _currentSection = widget.section;
-        _isStudentsFetched = false; // Reset flag when section changes
+        _isStudentsFetched = false;
+        _searchController.clear(); // Clear the search input
+        _filteredStudents = [];
       });
       _fetchAttendanceForDate(_selectedDate);
     }
@@ -109,36 +137,59 @@ class _AttendancePageState extends State<AttendancePage> {
             );
           }
         },
-        child: BlocBuilder<AttendanceBloc, AttendanceState>(
-          builder: (context, state) {
-            if (state is AttendanceLoading) {
-              return const Center(child: CustomShimmer());
-            } else if (state is AttendanceLoaded) {
-              if (state.attendanceList.isEmpty) {
-                _fetchStudentsForSection();
-                return BlocBuilder<SectionStudentBloc, SectionStudentState>(
-                  builder: (context, studentState) {
-                    if (studentState is StudentLoaded) {
-                      _students = studentState.students;
-                      _initializeAttendanceStatus();
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search students...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  prefixIcon: const Icon(Icons.search),
+                ),
+              ),
+            ),
+            Expanded(
+              child: BlocBuilder<AttendanceBloc, AttendanceState>(
+                builder: (context, state) {
+                  if (state is AttendanceLoading) {
+                    return const Center(child: CustomShimmer());
+                  } else if (state is AttendanceLoaded) {
+                    if (state.attendanceList.isEmpty) {
+                      _fetchStudentsForSection();
+                      return BlocBuilder<SectionStudentBloc,
+                          SectionStudentState>(
+                        builder: (context, studentState) {
+                          if (studentState is StudentLoaded) {
+                            _students = studentState.students;
+                            _initializeAttendanceStatus();
+                            _filteredStudents =
+                                _students; // Reset filtered list to all students in section
+                            return _buildAttendanceList(_filteredStudents);
+                          } else if (studentState is StudentError) {
+                            return Center(child: Text(studentState.message));
+                          } else if (studentState is StudentLoading) {
+                            return CustomShimmer();
+                          }
+                          return const Center(
+                              child: Text('No students available'));
+                        },
+                      );
+                    } else {
+                      _initializeAttendanceStatusFromLoaded(state);
                       return _buildAttendanceList(_students);
-                    } else if (studentState is StudentError) {
-                      return Center(child: Text(studentState.message));
-                    } else if (studentState is StudentLoading) {
-                      return CustomShimmer();
                     }
-                    return const Center(child: Text('No students available'));
-                  },
-                );
-              } else {
-                _initializeAttendanceStatusFromLoaded(state);
-                return _buildAttendanceList(_students);
-              }
-            } else if (state is AttendanceError) {
-              return Center(child: Text(state.message));
-            }
-            return const Center(child: Text('No students available'));
-          },
+                  } else if (state is AttendanceError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return const Center(child: Text('No students available'));
+                },
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: isToday

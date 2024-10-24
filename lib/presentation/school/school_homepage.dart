@@ -27,6 +27,7 @@ import 'package:schoolui/presentation/school/addStudentPage.dart';
 import 'package:schoolui/presentation/school/assignTeacher.dart';
 import 'package:schoolui/presentation/school/gradeList.dart';
 import 'package:schoolui/presentation/school/parentList.dart';
+import 'package:schoolui/presentation/school/schoolCommunication.dart';
 import 'package:schoolui/presentation/school/sectionList.dart';
 import 'package:schoolui/presentation/school/subjectList.dart';
 
@@ -200,8 +201,14 @@ class _HomePageState extends State<HomePage> {
             title: const Text('Manage'),
             actions: [
               IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.search, size: 30),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CommunicationPage()),
+                  );
+                },
+                icon: const Icon(Icons.message, size: 30),
               ),
             ],
           ),
